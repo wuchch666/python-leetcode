@@ -1,0 +1,199 @@
+1. leetcode27 原地删除数组中值为 val 的元素【都是返回元素个数-即慢指针k的取值】
+给你一个数组 nums 和一个值 val，你需要 原地 移除所有数值等于 val 的元素。元素的顺序可能发生改变。然后返回 nums 中与 val 不同的元素的数量。
+
+假设 nums 中不等于 val 的元素数量为 k，要通过此题，您需要执行以下操作：
+
+更改 nums 数组，使 nums 的前 k 个元素包含不等于 val 的元素。nums 的其余元素和 nums 的大小并不重要。
+返回 k。
+'''
+class Solution:
+    def removeElement(self, nums: List[int], val: int) -> int:
+        # 初始化快指针
+        k = 0
+        
+        # 遍历数组，当发现不等于 val 的元素时，将其移到数组前面
+        for i in range(len(nums)):
+            if nums[i] != val:
+                nums[k] = nums[i]
+                k += 1
+        
+        return k
+'''
+2. leetcode26 删除有序数组中的重复项【都是返回元素个数-即慢指针k的取值】
+给你一个 非严格递增排列 的数组 nums ，请你 原地 删除重复出现的元素，使每个元素 只出现一次 ，返回删除后数组的新长度。元素的 相对顺序 应该保持 一致 。然后返回 nums 中唯一元素的个数。
+
+考虑 nums 的唯一元素的数量为 k ，你需要做以下事情确保你的题解可以被通过：
+
+更改数组 nums ，使 nums 的前 k 个元素包含唯一元素，并按照它们最初在 nums 中出现的顺序排列。nums 的其余元素与 nums 的大小不重要。
+返回 k 。
+'''
+class Solution:
+    def removeDuplicates(self, nums: List[int]) -> int:
+        # 边界情况处理 如果为空，即nums为Flase，返回值为0
+        if not nums:
+            return 0
+        
+        # 初始化慢指针
+        k = 1
+        
+        # 遍历数组，当发现不重复的元素时，将其移到数组前面
+        for i in range(1, len(nums)):
+            if nums[i] != nums[i - 1]:
+                nums[k] = nums[i]
+                k += 1
+        
+        return k
+'''
+3. leetcode283 移动0 【先找到不为0的排序，然后后面的全部填充为0】
+给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
+
+请注意 ，必须在不复制数组的情况下原地对数组进行操作。
+'''
+class Solution:
+    def moveZeroes(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+         # 初始化快指针
+        k = 0
+        
+        # 遍历数组，当发现不等于 0 的元素时，将其移到数组前面
+        for i in range(len(nums)):
+            if nums[i] != 0:
+                nums[k] = nums[i]
+                k += 1
+        #历遍数组后半部分，全部填充为0
+        for i in range(k,len(nums)):
+            nums[i]=0
+        
+        return nums
+'''
+
+4. leetcode844 比较含退格的字符【用栈好理解，双指针不懂怎么算出来的】
+给定 s 和 t 两个字符串，当它们分别被输入到空白的文本编辑器后，如果两者相等，返回 true 。# 代表退格字符。【相当于删除键】
+
+注意：如果对空文本输入退格字符，文本继续为空。
+方法1-栈
+
+时间复杂度：O(M+N)
+空间复杂度：O(M+N)
+
+‘’‘
+class Solution:
+    def backspaceCompare(self, s: str, t: str) -> bool:
+        # 定义处理字符串的函数
+        def process_str(string):
+            result = []
+            for char in string:
+                if char != '#':
+                    result.append(char)
+                elif result:
+                    result.pop()
+            return ''.join(result)
+        
+        # 对比处理后的字符串是否相等
+        return process_str(s) == process_str(t)
+’‘’
+
+方法2-双指针
+
+时间复杂度：O（M+N)
+空间复杂度：O（1）
+'''
+class Solution:
+    def backspaceCompare(self, s: str, t: str) -> bool:
+        def next_valid_char_index(s, index):
+            skip = 0
+            while index >= 0:
+                if s[index] == '#':
+                    skip += 1
+                elif skip > 0:
+                    skip -= 1
+                else:
+                    return index
+                index -= 1
+            return -1
+
+        i, j = len(s) - 1, len(t) - 1
+        
+        while i >= 0 or j >= 0:
+            i = next_valid_char_index(s, i)
+            j = next_valid_char_index(t, j)
+            
+            if i >= 0 and j >= 0:
+                if s[i] != t[j]:
+                    return False
+            elif i >= 0 or j >= 0:
+                return False
+            
+            i -= 1
+            j -= 1
+        
+        return True
+'''
+
+双指针可读版
+‘’‘
+class Solution:
+    def backspaceCompare(self, S: str, T: str) -> bool:
+        i, j = len(S) - 1, len(T) - 1 #表示位置
+        skipS = skipT = 0 #表示跳过的次数，一半来说等于零的时候判断一下是否相等
+
+        while i >= 0 or j >= 0:
+            while i >= 0:
+                if S[i] == "#":
+                    skipS += 1
+                    i -= 1
+                elif skipS > 0:
+                    skipS -= 1
+                    i -= 1
+                else:
+                    break
+            while j >= 0:
+                if T[j] == "#":
+                    skipT += 1
+                    j -= 1
+                elif skipT > 0:
+                    skipT -= 1
+                    j -= 1
+                else:
+                    break
+            s = "" if i < 0 else S[i]
+            t = "" if j < 0 else T[j]
+            if s != t:
+                return False
+            i -= 1 #从后往前走
+            j -= 1
+        return True
+’‘’
+
+5. leetcode977 有序数组的平方排序【这里就是有一个负数的问题需要讨论，负数虽然值小，但是平方之后的值变大】
+给你一个按 非递减顺序 排序的整数数组 nums，返回 每个数字的平方 组成的新数组，要求也按 非递减顺序 排序。
+
+时间复杂度：O(N)
+空间复杂度：O(N)
+‘’‘
+class Solution:
+    def sortedSquares(self, nums: List[int]) -> List[int]:
+        n = len(nums)
+        result = [0] * n
+        left, right = 0, n - 1
+        index = n - 1 #相当于指定最后一位
+        
+        while left <= right:
+            left_square = nums[left] ** 2
+            right_square = nums[right] ** 2
+            
+            if left_square > right_square:
+                result[index] = left_square #每次去把大的取出来放在末尾
+                left += 1
+            else:
+                result[index] = right_square
+                right -= 1
+            
+            index -= 1
+        
+        return result
+
+
+‘’‘
